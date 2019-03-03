@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from scipy.linalg import det
-import numpy as np
-
 
 def calculate_determinant(list_of_lists):
     '''
