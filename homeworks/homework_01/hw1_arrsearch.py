@@ -18,9 +18,8 @@ def find_indices(input_list, n):
             j = input_list.index(n - input_list[i])
             if i == j:
                 continue
-            return i, j  
+            return i, j
         except ValueError:
             continue
-                      
-    return None
 
+    return None

@@ -22,14 +22,14 @@ def is_bracket_correct(input_string):
                 tmp = tmp_stack.pop()
             except IndexError:
                 return False
-            
             else:
-                if (tmp, bracket) != ('[', ']') and (tmp, bracket) != ('{', '}')  and (tmp, bracket) != ('(', ')'):
+                if ((tmp, bracket) != ('[', ']') and
+                    (tmp, bracket) != ('{', '}') and
+                        (tmp, bracket) != ('(', ')')):
                     return False
-            
         else:
             return False
-        
+
     if len(tmp_stack) == 0:
         return True
     else:
