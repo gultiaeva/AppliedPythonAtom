@@ -97,7 +97,7 @@ def correct_operands(expr):
     return expr
 
 
-def convert_to_kurwa(string):
+def convert_to_polish(string):
     '''
     Функция перевода строки из инфиксной нотации в обратную польскую нотацию
 
@@ -205,6 +205,6 @@ def advanced_calculator(expr):
     '''
 
     if is_valid(expr):
-        return calc(convert_to_kurwa(correct_operands(expr)))
+        return calc(convert_to_polish(correct_operands(expr)))
     else:
         return None
