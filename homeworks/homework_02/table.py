@@ -8,7 +8,7 @@ from collections import OrderedDict
 
 def main(filename):
     match = re.fullmatch(r'^.+-(.+)\..+$', filename)
-    encoding= match[1]
+    encoding = match[1]
     data = read_file(filename, encoding)
     if data:
         pretty_print(data)

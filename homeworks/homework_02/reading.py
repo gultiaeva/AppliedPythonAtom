@@ -11,9 +11,10 @@ def read_file(filename, enc):
             return read_tsv(filename, enc)
         except IndexError:
             print("Формат не валиден")
-    
+
     return None
-    
+
+
 def read_tsv(filename, enc):
     with open(filename, 'r', encoding=enc) as tsv:
         data = [[], [], [], []]
@@ -26,6 +27,7 @@ def read_tsv(filename, enc):
             data[3].append(tmp[3])
     return data
 
+
 def read_json(filename, enc):
     with open(filename, 'r', encoding=enc) as f:
         raw_data = json.load(f, object_pairs_hook=list, parse_int=str)
@@ -36,4 +38,3 @@ def read_json(filename, enc):
         data[2].append(item[2][1])
         data[3].append(item[3][1])
     return data
-

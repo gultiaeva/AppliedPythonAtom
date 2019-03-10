@@ -18,7 +18,7 @@ class User:
 class Post:
     def __init__(self, post_id):
         self._views = []
-    
+
 
 class VKPoster:
 
@@ -45,7 +45,6 @@ class VKPoster:
         self._check_user(user_id)
         self._check_post(post_id)
         self._users[user_id]._posted.append(post_id)
-        
 
     def user_read_post(self, user_id: int, post_id: int):
         '''
@@ -59,7 +58,6 @@ class VKPoster:
         self._check_post(post_id)
         if user_id not in self._posts[post_id]._views:
             self._posts[post_id]._views.append(user_id)
-        
 
     def user_follow_for(self, follower_user_id: int, followee_user_id: int):
         '''
@@ -73,7 +71,7 @@ class VKPoster:
         self._check_user(follower_user_id)
         self._users[follower_user_id]._following.append(followee_user_id)
 
-    def get_recent_posts(self, user_id: int, k: int)-> list:
+    def get_recent_posts(self, user_id: int, k: int) -> list:
         '''
         Метод который вызывается когда пользователь user_id
         запрашивает k свежих постов людей на которых он подписан.
@@ -82,9 +80,10 @@ class VKPoster:
         :return: Список из post_id размером К из свежих постов в
         ленте пользователя. list
         '''
-        tmp = merge(*[self._users[user]._posted for user in self._users[user_id]._following])
+        tmp = merge(
+            *[self._users[user]._posted for user in
+                self._users[user_id]._following])
         return nlargest(k, tmp)
-        
 
     def get_most_popular_posts(self, k: int) -> list:
         '''
@@ -94,5 +93,6 @@ class VKPoster:
         необходимо вывести. Число.
         :return: Список из post_id размером К из популярных постов. list
         '''
-        tmp = nlargest(k, self._posts, key=lambda post_id: [len(self._posts[post_id]._views), post_id])
+        tmp = nlargest(k, self._posts, key=lambda post_id: [
+                       len(self._posts[post_id]._views), post_id])
         return tmp
