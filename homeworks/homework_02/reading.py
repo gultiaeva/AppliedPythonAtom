@@ -5,12 +5,13 @@ def read_file(filename, enc):
     try:
         return read_json(filename, enc)
     except FileNotFoundError:
-        return "Файл не валиден"
+        print("Файл не валиден")
     except json.JSONDecodeError:
         try:
             return read_tsv(filename, enc)
         except IndexError:
-            return "Формат не валиден"
+            print("Формат не валиден")
+    return None
 
 
 def read_tsv(filename, enc):
