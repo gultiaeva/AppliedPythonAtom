@@ -2,18 +2,12 @@ from reading import *
 from printing import *
 import sys
 import json
-import re
 
 
 def main(filename):
-    match = re.fullmatch(r'^.+-(.+)\..+$', filename)
-    if not match:
-        print("Файл не валиден")
-    else:
-        encoding = match[1]
-        data = read_file(filename, encoding)
-        if data:
-            pretty_print(data)
+    data = read_file(filename)
+    if data:
+        pretty_print(data)
 
 
 if __name__ == "__main__":
