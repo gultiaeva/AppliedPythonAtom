@@ -4,7 +4,7 @@ def get_full_length(data):
 
 def pretty_print(data):
     lens = get_full_length(data)
-    if lens == 0:
+    if not lens:
         print("Формат не валиден")
         return None
     hyps = '-' * (sum(lens) + (len(lens) - 1) * 5 + 6)

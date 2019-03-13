@@ -42,10 +42,10 @@ def read_file(filename):
         if any(len(row) != len(data[0]) for row in data[1:]):
             print("Формат не валиден")
             return None
-        return data
     else:
         print("Файл не валиден")
         return None
+    return data
 
 
 def read_tsv(filename, enc):
@@ -62,8 +62,15 @@ def read_tsv(filename, enc):
 
 
 def read_json(filename, enc):
-    with open(filename, 'r', encoding=enc) as f:
-        raw_data = json.load(f, object_pairs_hook=dict, parse_int=str)
+    try:
+        with open(filename, 'r', encoding=enc) as f:
+            raw_data = json.load(f, object_pairs_hook=dict, parse_int=str)
+    except ValueError:
+        print("Формат не валиден")
+        return None
+    except UnicodeDecodeError:
+        print("Формат не валиден")
+        return None
     head = raw_data[0]
     headers = head.keys()
     data = [[header] for header in headers]
