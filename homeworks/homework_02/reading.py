@@ -2,7 +2,7 @@ import json
 import csv
 
 
-DEFAULT_ENCODINGS = ['utf8', 'utf16', 'cp1251']
+DEFAULT_ENCODINGS = ['utf-16', 'utf8', 'cp1251']
 
 
 def define_encoding(filename, enclist=DEFAULT_ENCODINGS):
@@ -12,40 +12,27 @@ def define_encoding(filename, enclist=DEFAULT_ENCODINGS):
                 # Костыль
                 f.readline()
                 return enc
+        except UnicodeDecodeError:
+            continue
         except UnicodeError:
             continue
+        except FileNotFoundError:
+            return -1
     return None
 
 
 def read_file(filename):
+    enc = define_encoding(filename)
+    if not enc:
+        print("Формат не валиден")
+        return None
+    elif enc == -1:
+        print("Файл не валиден")
+        return None
     try:
-        with open(filename) as f:
-            pass
-    except FileNotFoundError:
-        print("Файл не валиден")
-        return None
-    if filename:
-        enc = define_encoding(filename)
-        if not enc:
-            print("Формат не валиден")
-            return None
-        format = get_format(filename, enc)
-
-        if format == 'json':
-            data = read_json(filename, enc)
-        elif format == 'tsv':
-            data = read_tsv(filename, enc)
-        else:
-            print("Формат не валиден")
-            return None
-
-        if any(len(row) != len(data[0]) for row in data):
-            print("Формат не валиден")
-            return None
-    else:
-        print("Файл не валиден")
-        return None
-    return data
+        return read_json(filename, enc)
+    except UnicodeDecodeError:
+        return read_tsv(filename, enc)
 
 
 def read_tsv(filename, enc):
@@ -62,15 +49,8 @@ def read_tsv(filename, enc):
 
 
 def read_json(filename, enc):
-    try:
-        with open(filename, 'r', encoding=enc) as f:
-            raw_data = json.load(f, object_pairs_hook=dict, parse_int=str)
-    except ValueError:
-        print("Формат не валиден")
-        return None
-    except UnicodeDecodeError:
-        print("Формат не валиден")
-        return None
+    with open(filename, 'r', encoding=enc) as f:
+        raw_data = json.load(f, object_pairs_hook=dict, parse_int=str)
     head = raw_data[0]
     headers = head.keys()
     data = [[header] for header in headers]
@@ -81,7 +61,7 @@ def read_json(filename, enc):
 
     return data
 
-
+'''
 def is_json(filename, enc):
     try:
         with open(filename, encoding=enc) as f_obj:
@@ -105,3 +85,4 @@ def get_format(filename, enc):
         return 'json'
     elif is_tsv(filename, enc):
         return "tsv"
+'''

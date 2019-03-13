@@ -4,10 +4,6 @@ def get_full_length(data):
 
 def pretty_print(data):
     lens = get_full_length(data)
-    if not lens:
-        print("Формат не валиден")
-        return None
-
     for i in range(len(data[0])):
         tmp = [col[i] for col in data]
         if len(tmp) == 0 or len(tmp) != len(lens):
