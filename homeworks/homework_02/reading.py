@@ -39,7 +39,7 @@ def read_file(filename):
             print("Формат не валиден")
             return None
 
-        if any(len(row) != len(data[0]) for row in data[1:]):
+        if any(len(row) != len(data[0]) for row in data):
             print("Формат не валиден")
             return None
     else:
