@@ -16,3 +16,8 @@ if __name__ == "__main__":
         main(filename)
     except IndexError:
         print('Файл не валиден')
+
+try:
+    main('test.tsv')
+except IndexError:
+    print('Файл не валиден')
