@@ -4,6 +4,9 @@ def get_full_length(data):
 
 def pretty_print(data):
     lens = get_full_length(data)
+    if lens == 0:
+        print("Формат не валиден")
+        return None
     hyps = '-' * (sum(lens) + (len(lens) - 1) * 5 + 6)
     print(hyps)
     banner = '|  ' + '  |  '.join(column[0].center(col_len)

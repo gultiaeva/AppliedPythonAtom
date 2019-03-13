@@ -1,4 +1,5 @@
 import json
+import csv
 
 
 DEFAULT_ENCODINGS = ['utf8', 'utf16', 'cp1251']
@@ -17,17 +18,32 @@ def define_encoding(filename, enclist=DEFAULT_ENCODINGS):
 
 
 def read_file(filename):
-    enc = define_encoding(filename)
     try:
-        return read_json(filename, enc)
+        with open(filename) as f_obj:
+            pass
     except FileNotFoundError:
         print("Файл не валиден")
-    except json.JSONDecodeError:
-        try:
-            return read_tsv(filename, enc)
-        except IndexError:
+        return None
+    if filename:
+        enc = define_encoding(filename)
+        if not enc:
             print("Формат не валиден")
-    return None
+            return None
+        format = get_format(filename, enc)
+        if not format:
+            print("Формат не валиден")
+            return None
+        with open(filename, encoding=enc) as f:
+            if format == 'json':
+                data = read_json(f)
+            elif format == 'tsv':
+                data = read_tsv(f)
+        if any(len(row) != len(data[0]) for row in data[1:]):
+            print("Формат не валиден")
+            return None
+    else:
+        print("Файл не валиден")
+        return None
 
 
 def read_tsv(filename, enc):
@@ -55,3 +71,28 @@ def read_json(filename, enc):
             data[i].append(val)
 
     return data
+
+
+def is_json(filename, enc):
+    try:
+        with open(filename, encoding=enc) as f_obj:
+            json.load(f_obj)
+            return True
+    except json.JSONDecodeError:
+        return False
+
+
+def is_tsv(filename, enc):
+    try:
+        with open(filename, encoding=enc) as f_obj:
+            csv.reader(f_obj, delimiter="\t")
+            return True
+    except csv.Error:
+        return False
+
+
+def get_format(filename, enc):
+    if is_json(filename, enc):
+        return 'json'
+    elif is_tsv(filename, enc):
+        return "tsv"
