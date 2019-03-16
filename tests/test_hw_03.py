@@ -206,7 +206,7 @@ def test_hashset_05():
     assert len(hashset_3) == len(entries)
 
 
-def test_hashset_05():
+def test_hashset_06():
     try:
         hashset = HashSet()
     except NotImplementedError:
@@ -221,7 +221,7 @@ def test_hashset_05():
     hashset_3 = hashset.intersect(hashset_2)
     assert hashset_3 is not hashset
     assert hashset_3 is not hashset_2
-    assert len(hashset_3) == len(entries)
+    assert len(hashset_3) == 0
 
 
 def test_lrucache_01():
@@ -450,7 +450,7 @@ def test_groupping_anagramms_03():
 
 def test_event_stats_01():
     try:
-        revert_linked_list(None)
+        TEventStats()
     except NotImplementedError:
         return True
 
