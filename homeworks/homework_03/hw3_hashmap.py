@@ -59,12 +59,15 @@ class HashMap:
     def get(self, key, default_value=None):
         # Метод get, возвращающий значение,
         #  если оно присутствует, иначе default_value
-        for bucket in self._buckets:
-            if bucket is None:
-                continue
-            for item in bucket:
-                if item._key == key:
-                    return item._value
+        try:
+            pos = self._get_index(self._get_hash(key))
+        except TypeError:
+            return default_value
+        if self._buckets[pos] is None:
+            return default_value
+        for item in self._buckets[pos]:
+            if item._key == key:
+                return item._value
         return default_value
 
     def put(self, key, value):
