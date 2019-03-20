@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
+import shutil
 
 
 class Requester:
@@ -57,8 +59,26 @@ class MockOrdinaryFileWorker(OrdinaryFileWorker):
       при создании объекта, директория ./tmp должна создаваться
      если еще не создана
     '''
+    TEST_DIR_PATH = "./homeworks/homework_03/test_dir/"
+    TMP_DIR_PATH = "./tmpf/"
+
     def __init__(self):
-        raise NotImplementedError
+        if not os.path.exists(self.TMP_DIR_PATH):
+            os.makedirs(self.TMP_DIR_PATH)
+
+    def __del__(self):
+        if os.path.exists(self.TMP_DIR_PATH):
+            shutil.rmtree(self.TMP_DIR_PATH)
+
+    def transfer_to_local(self, filename):
+        with open(self.TEST_DIR_PATH + filename + '.tmp') as f:
+            with open(self.TMP_DIR_PATH + filename, 'w') as f1:
+                f1.writelines(f.read())
+
+    def transfer_to_remote(self, filename):
+        with open(self.TEST_DIR_PATH + filename, 'r') as f:
+            with open(self.TMP_DIR_PATH + filename + '.tmp', 'w') as f1:
+                f1.writelines(f.read())
 
 
 class LLNode:
