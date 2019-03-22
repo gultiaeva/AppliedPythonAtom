@@ -18,7 +18,6 @@ def word_count_inference(path_to_dir):
     '''
     p = Pool(10)
     files = os.listdir(path_to_dir)
-
     # Пути относительно cwd
     fullpaths = map(lambda x: f'{path_to_dir}/{x}', files)
     out = p.map(count_words, fullpaths)
