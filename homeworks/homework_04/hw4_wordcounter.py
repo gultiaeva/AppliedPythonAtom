@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-from multiprocessing import Process, Manager
+import subprocess
+from multiprocessing import Pool
 import os
 
 
@@ -16,4 +16,23 @@ def word_count_inference(path_to_dir):
     :return: словарь, где ключ - имя файла, значение - число слов +
         специальный ключ "total" для суммы слов во всех файлах
     '''
-    raise NotImplementedError
+    p = Pool(10)
+    files = os.listdir(path_to_dir)
+
+    # Пути относительно cwd
+    fullpaths = map(lambda x: f'{path_to_dir}/{x}', files)
+    out = p.map(count_words, fullpaths)
+    words = {}
+    for fn, c in out:
+        words[fn] = c
+    words['total'] = sum(words.values())
+    return words
+
+
+def count_words(fname):
+    cmd = f"cat {fname} | wc -w"
+    ps = subprocess.Popen(cmd, shell=True,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT)
+    output = int(ps.communicate()[0].strip())
+    return os.path.split(fname)[-1], output
