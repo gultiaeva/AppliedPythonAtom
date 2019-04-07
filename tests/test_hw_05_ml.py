@@ -94,18 +94,20 @@ def test_csr_matrix_init_from_data_row_col():
     data = []
     row_ind = []
     col_ind = []
-    for i, j in zip(range(matrix.shape[0]), range(matrix.shape[1])):
-        data.append(matrix[i, j])
-        row_ind.append(i)
-        col_ind.append(j)
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            data.append(matrix[i, j])
+            row_ind.append(i)
+            col_ind.append(j)
 
     try:
         csr_matrix = CSRMatrix((row_ind, col_ind, data))
     except NotImplementedError:
         return True
 
-    for i, j in zip(range(matrix.shape[0]), range(matrix.shape[1])):
-        assert np.isclose(matrix[i, j], csr_matrix.get_item(i, j))
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            assert np.isclose(matrix[i, j], csr_matrix.get_item(i, j))
 
 
 def test_csr_matrix_get_item_method():
@@ -117,8 +119,9 @@ def test_csr_matrix_get_item_method():
     except NotImplementedError:
         return True
 
-    for i, j in zip(range(matrix.shape[0]), range(matrix.shape[1])):
-        assert np.isclose(matrix[i, j], csr_matrix.get_item(i, j))
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            assert np.isclose(matrix[i, j], csr_matrix.get_item(i, j))
 
 
 def test_csr_matrix_set_item_method():
@@ -126,16 +129,19 @@ def test_csr_matrix_set_item_method():
 
     zero_matrix = np.zeros((200, 200))
     matrix = np.random.randint(0, 3, (200, 200))
+
     try:
         csr_matrix = CSRMatrix(zero_matrix)
     except NotImplementedError:
         return True
 
-    for i, j in zip(range(matrix.shape[0]), range(matrix.shape[1])):
-        csr_matrix.set_item(i, j, matrix[i, j])
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            csr_matrix.set_item(i, j, matrix[i, j])
 
-    for i, j in zip(range(matrix.shape[0]), range(matrix.shape[1])):
-        assert np.isclose(matrix[i, j], csr_matrix.get_item(i, j))
+    for i in reversed(range(matrix.shape[0])):
+        for j in reversed(range(matrix.shape[1])):
+            assert np.isclose(matrix[i, j], csr_matrix.get_item(i, j))
 
 
 def test_csr_matrix_03_to_dense_method():
@@ -149,5 +155,6 @@ def test_csr_matrix_03_to_dense_method():
 
     dense_matrix = csr_matrix.to_dense()
 
-    for i, j in zip(range(matrix.shape[0]), range(matrix.shape[1])):
-        assert np.isclose(matrix[i, j], dense_matrix[i, j])
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            assert np.isclose(matrix[i, j], dense_matrix[i, j])
