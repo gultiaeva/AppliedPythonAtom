@@ -8,8 +8,10 @@ import numpy as np
 class CSRMatrix:
     """
     CSR (2D) matrix.
-    Here you can read how CSR sparse matrix works: https://en.wikipedia.org/wiki/Sparse_matrix
+    Here you can read how CSR sparse matrix works:
+    https://en.wikipedia.org/wiki/Sparse_matrix
     """
+
     def __init__(self, init_matrix_representation):
         """
         :param init_matrix_representation: can be usual dense matrix
@@ -18,31 +20,97 @@ class CSRMatrix:
             where data, row_ind and col_ind satisfy the relationship:
             a[row_ind[k], col_ind[k]] = data[k]
         """
-        if isinstance(init_matrix_representation, tuple) and len(init_matrix_representation) == 3:
-            pass
+        if isinstance(init_matrix_representation, tuple) and len(
+                init_matrix_representation) == 3:
+            self._initialize_with_tuple_of_arrays(init_matrix_representation)
         elif isinstance(init_matrix_representation, np.ndarray):
-            pass
+            self._initialize_with_dense_matrix(init_matrix_representation)
         else:
             raise ValueError
 
-        raise NotImplementedError
+    def _initialize_with_tuple_of_arrays(self, init_data):
+        '''
+        Инициализация CSR матрицы, если был передан кортеж
+        (row_ind, col, data) tuple with np.arrays
+        '''
+        rows = init_data[0]
+        cols = init_data[1]
+        values = init_data[2]
+        # IA[i] = IA[i-1] + кол-во ненулевых элементов в i-той строке
+        # Поэтому используем cumsum
+        counts = np.unique(rows, return_counts=True)[1].cumsum()
+        self.A = np.array([])
+        self.IA = np.insert(counts, 0, 0)
+        self.JA = np.array([], dtype='int64')
+        for row, col, value in sorted(zip(rows, cols, values)):
+            self.A = np.append(self.A, value)
+            self.JA = np.append(self.JA, col)
+        shape = sorted(zip(rows, cols, values))[-1][:2]
+        self.shape = (shape[0] + 1, shape[1] + 1)
+
+    def _initialize_with_dense_matrix(self, init_matrix):
+        '''
+        Инициализация CSR матрицы, если была передана обычная матрица
+        '''
+        self.shape = init_matrix.shape
+        self.A = np.array([])
+        self.IA = np.array([0, ])
+        self.JA = np.array([], dtype='int64')
+        for ix_row in np.arange(0, self.shape[0]):
+            nonzero = 0
+            # Для каждой строки считаем кол-во ненулевых элементов
+            # И добавляем его в self.IA
+            for ix_col in np.arange(0, self.shape[1]):
+                if init_matrix[ix_row, ix_col] != 0:
+                    nonzero += 1
+                    self.A = np.append(self.A, init_matrix[ix_row, ix_col])
+                    self.JA = np.append(self.JA, ix_col)
+            self.IA = np.append(self.IA, self.IA[ix_row] + nonzero)
 
     def get_item(self, i, j):
         """
         Return value in i-th row and j-th column.
-        Be careful, i and j may have invalid values (-1 / bigger that matrix size / etc.).
+        Be careful, i and j may have invalid values
+        (-1 / bigger that matrix size / etc.).
         """
-        raise NotImplementedError
+        if 0 <= i < self.shape[0] and 0 <= j < self.shape[1]:
+            for ix in np.arange(self.IA[i], self.IA[i + 1]):
+                if self.JA[ix] == j:
+                    return self.A[ix]
+        else:
+            return None
+        return 0
 
     def set_item(self, i, j, value):
         """
         Set the value to i-th row and j-th column.
-        Be careful, i and j may have invalid values (-1 / bigger that matrix size / etc.).
+        Be careful, i and j may have invalid values
+        (-1 / bigger that matrix size / etc.).
         """
-        raise NotImplementedError
+        if not(0 <= i < self.shape[0] and 0 <= j < self.shape[1]):
+            raise KeyError("Invalid coords")
+
+        tmp = self.IA[i]
+        if value != 0:
+            self.A = np.insert(self.A, tmp, value)
+            self.IA[i + 1:] += 1
+            self.JA = np.insert(self.JA, tmp, j)
+        else:
+            # Удаляем элемент, который хотим заменить на 0
+            for ix in np.arange(self.IA[i], self.IA[i + 1]):
+                if self.JA[ix] == j:
+                    self.IA[i + 1:] -= 1
+                    self.JA = np.delete(self.JA, tmp, j)
+                    self.A = np.delete(self.A, tmp, j)
+                tmp = ix
 
     def to_dense(self):
         """
         Return dense representation of matrix (2D np.array).
         """
-        raise NotImplementedError
+        result = np.zeros(self.shape)
+        for i in np.arange(0, self.shape[0]):
+            for j in np.arange(self.IA[i], self.IA[i + 1]):
+                k = self.JA[j]
+                result[i][k] = self.A[j]
+        return result
