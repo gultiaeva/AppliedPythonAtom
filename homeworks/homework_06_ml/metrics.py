@@ -12,7 +12,7 @@ def mse(y_true, y_hat, derivative=False):
     :param y_hat: vector of estimated target values
     :return: loss
     """
-    pass
+    return (y_true - y_hat).dot((y_true - y_hat)) / len(y_true)
 
 
 def mae(y_true, y_hat):
@@ -22,7 +22,7 @@ def mae(y_true, y_hat):
     :param y_hat: vector of estimated target values
     :return: loss
     """
-    pass
+    return np.sum(np.abs((y_true - y_hat))) / len(y_true)
 
 
 def r2_score(y_true, y_hat):
@@ -32,4 +32,7 @@ def r2_score(y_true, y_hat):
     :param y_hat: vector of estimated target values
     :return: loss
     """
-    pass
+    mean_y = y_true.mean()
+    Qfact = (y_hat - mean_y).dot((y_hat - mean_y))
+    Qall = (y_true - mean_y).dot((y_true - mean_y))
+    return Qfact / Qall
