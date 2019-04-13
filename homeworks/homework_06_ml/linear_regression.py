@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from metrics import *
-
 
 class LinearRegression:
     def __init__(self, lambda_coef=0.1, regulatization=None, alpha=0.5):
@@ -36,7 +34,8 @@ class LinearRegression:
             else:
                 add = 0
             prediction = self.predict(X_train)
-            self.__w -= (2/n) * self.learning_rate*(X_train.T.dot((prediction - y_train)) + add)
+            self.__w -= (2/n) * self.learning_rate*(X_train.T.dot(
+                (prediction - y_train)) + add)
             cost_history[it] = mse(y_train, prediction)
             if it and abs(cost_history[it] - cost_history[it-1]) < eps:
                 break
