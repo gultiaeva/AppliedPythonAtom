@@ -2,6 +2,10 @@
 # coding: utf-8
 
 
+import numpy as np
+from metrics import mse
+
+
 class LinearRegression:
     def __init__(self, lambda_coef=0.1, regulatization=None, alpha=0.5):
         """
