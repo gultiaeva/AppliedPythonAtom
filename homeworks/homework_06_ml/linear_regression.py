@@ -13,7 +13,8 @@ class LinearRegression:
         :param regulatization: regularizarion type ("L1" or "L2") or None
         :param alpha: regularizarion coefficent
         """
-        assert regulatization in ('L1', 'L2', None)
+        assert regulatization in ('L1', 'L2', None), \
+            "Unknown regularization parameter"
         self.learning_rate = lambda_coef
         self.regularizarion = regulatization
         self.alpha = alpha
@@ -25,6 +26,7 @@ class LinearRegression:
         :param y_train: target values for training data
         :return: None
         """
+        assert X_train.shape[0] == y_train.shape[0], "Shapes don't match"
         ones = np.ones((X_train.shape[0], 1))
         X_train = np.hstack([ones, X_train])
         n, m = X_train.shape
@@ -53,6 +55,7 @@ class LinearRegression:
         :param X_test: test data for predict in
         :return: y_test: predicted values
         """
+        assert getattr(self, '__w', 0) != 0, 'Model is not fitted'
         if all(X_test[:, 0] == 1):
             return X_test.dot(self.__w)
         else:
@@ -65,6 +68,7 @@ class LinearRegression:
         Get weights from fitted linear model
         :return: weights array
         """
+        assert getattr(self, '__w', 0) != 0, 'Model is not fitted'
         return self.__w
 
     def __repr__(self):
