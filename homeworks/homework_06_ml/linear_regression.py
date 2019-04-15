@@ -18,6 +18,7 @@ class LinearRegression:
         self.learning_rate = lambda_coef
         self.regularizarion = regulatization
         self.alpha = alpha
+        self.__fitted = False
 
     def fit(self, X_train, y_train, iterations=1000, eps=1e-6):
         """
@@ -26,6 +27,7 @@ class LinearRegression:
         :param y_train: target values for training data
         :return: None
         """
+        self.__fitted = True
         assert X_train.shape[0] == y_train.shape[0], "Shapes don't match"
         ones = np.ones((X_train.shape[0], 1))
         X_train = np.hstack([ones, X_train])
@@ -35,8 +37,10 @@ class LinearRegression:
         for it in range(iterations):
             if self.regularizarion == 'L1':
                 add = self.alpha * np.ones(m) / 2
+                add[0] = 0
             elif self.regularizarion == 'L2':
                 add = self.alpha * self.__w
+                add[0] = 0
             else:
                 add = 0
             prediction = self.predict(X_train)
@@ -55,7 +59,7 @@ class LinearRegression:
         :param X_test: test data for predict in
         :return: y_test: predicted values
         """
-        assert getattr(self, '__w', 0) != 0, 'Model is not fitted'
+        assert self.__fitted, 'Model is not fitted'
         if all(X_test[:, 0] == 1):
             return X_test.dot(self.__w)
         else:
