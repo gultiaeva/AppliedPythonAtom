@@ -51,16 +51,25 @@ class LogisticRegression:
         Labels: (200, 1)
         Weights:(3, 1)
         '''
-        N = len(X)
+        n, m = X.shape
         # 1 - Get Predictions
         predictions = self.predict(X)
+        if self.regularizarion == 'L1':
+                add = self.alpha * np.ones(m)
+                add[0] = 0
+        elif self.regularizarion == 'L2':
+            add = self.alpha * self.__w * 2
+            add[0] = 0
+        else:
+            add = 0
 
         # 2 Transpose features from (200, 3) to (3, 200)
         # So we can multiply w the (200,1)  cost matrix.
         # Returns a (3,1) matrix holding 3 partial derivatives --
         # one for each feature -- representing the aggregate
         # slope of the cost function across all observations
-        avg_gradient = self.learning_rate * np.dot(X.T,  predictions - y) / N
+        avg_gradient = self.learning_rate * (
+            np.dot(X.T,  predictions - y) + add) / n
 
         # 5 - Subtract from our weights to minimize cost
         self.__w -= avg_gradient
@@ -77,12 +86,17 @@ class LogisticRegression:
         ones = np.ones((X_train.shape[0], 1))
         X_train = np.hstack([ones, X_train])
         n, m = X_train.shape
-        self.__w = np.random.randn(m) / np.sqrt(m)
+        self.__w = np.random.randn(m)
+        cost = np.inf
 
         for i in range(self.iter_num):
             self.update_weights(X_train, y_train)
             # Calculate error for auditing purposes
-            cost = self.loss(X_train, y_train)
+            tmp = self.loss(X_train, y_train)
+            if np.abs(tmp - cost) < eps:
+                cost = tmp
+                break
+            cost = tmp
 
         return self
 
