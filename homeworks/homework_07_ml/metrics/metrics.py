@@ -12,7 +12,11 @@ def logloss(y_true, y_pred):
     :param y_hat: vector of estimated probabilities
     :return: loss
     """
-    pass
+    class1_cost = -y_true*np.log(y_pred)
+    class2_cost = (1-y_true)*np.log(1-y_pred)
+    cost = class1_cost + class2_cost
+    cost = cost.sum() / len(observations)
+    return cost
 
 
 def accuracy(y_true, y_pred):
@@ -22,7 +26,7 @@ def accuracy(y_true, y_pred):
     :param y_hat: vector of estimated class values
     :return: loss
     """
-    pass
+    return (y_true == y_pred) / len(y_pred)
 
 
 def presicion(y_true, y_pred):
@@ -32,7 +36,7 @@ def presicion(y_true, y_pred):
     :param y_hat: vector of estimated class values
     :return: loss
     """
-    pass
+    y_pred[y_true == y_pred].sum() / (y_pred == 1).sum()
 
 
 def recall(y_true, y_pred):
@@ -42,7 +46,7 @@ def recall(y_true, y_pred):
     :param y_hat: vector of estimated class values
     :return: loss
     """
-    pass
+    y_pred[y_true == y_pred].sum() / (y_true == 1).sum()
 
 
 def roc_auc(y_true, y_pred):
