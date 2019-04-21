@@ -6,17 +6,17 @@ import numpy as np
 
 
 class LogisticRegression:
-    def __init__(self, lambda_coef=1.0, regulatization=None, alpha=0.5, n_iter=10000):
+    def __init__(self, lambda_coef=1.0, regularization=None, alpha=0.5, n_iter=10000):
         """
         LogReg for Binary case
         :param lambda_coef: constant coef for gradient descent step
         :param regulatization: regularizarion type ("L1" or "L2") or None
         :param alpha: regularizarion coefficent
         """
-        assert regulatization in ('L1', 'L2', None),\
+        assert regularization in ('L1', 'L2', None),\
             'Wrong regularization type'
         self.learning_rate = lambda_coef
-        self.regularizarion = regulatization
+        self.regularizarion = regularization
         self.alpha = alpha
         self.iter_num = n_iter
 
@@ -25,35 +25,32 @@ class LogisticRegression:
 
     def loss(self, X, y):
         '''
-        Using Mean Absolute Error
 
-        X:(100,3)
-        y: (100,1)
-        self.__w:(3,1)
+        X: matrix of n objects & m features for each
+        y: vector of true labels
         Returns 1D matrix of predictions
         Cost = (y*log(pred) + (1-y)*log(1-pred) ) / len(y)
         '''
-        observations = len(y)
 
-        predictions = self.predict(X)
-        class1_cost = -y*np.log(predictions)
-        class2_cost = (1-y)*np.log(1-predictions)
+        predictions = self.predict_proba(X)[:, 1]
+        class1_cost = -y * np.log(predictions)
+        class2_cost = (1 - y) * np.log(1 - predictions)
         cost = class1_cost + class2_cost
-        cost = cost.sum() / observations
+        cost = cost.sum() / len(y)
 
         return cost
 
-    def update_weights(self, X, y):
+    def _update_weights(self, X, y):
         '''
-        Vectorized Gradient Descent
+        Updates weigsts using gradient descent
 
-        Features:(200, 3)
-        Labels: (200, 1)
-        Weights:(3, 1)
+        X: matrix of n objects & m features for each
+        y: vector of true labels
         '''
         n, m = X.shape
-        # 1 - Get Predictions
-        predictions = self.predict(X)
+        # Get Predictions
+        predictions = self.predict_proba(X)[:, 1]
+        # Provide L1 & L2 regularization
         if self.regularizarion == 'L1':
                 add = self.alpha * np.ones(m)
                 add[0] = 0
@@ -63,15 +60,11 @@ class LogisticRegression:
         else:
             add = 0
 
-        # 2 Transpose features from (200, 3) to (3, 200)
-        # So we can multiply w the (200,1)  cost matrix.
-        # Returns a (3,1) matrix holding 3 partial derivatives --
-        # one for each feature -- representing the aggregate
-        # slope of the cost function across all observations
+        # Calculate step for gradient descent
         avg_gradient = self.learning_rate * (
             np.dot(X.T,  predictions - y) + add) / n
 
-        # 5 - Subtract from our weights to minimize cost
+        # Subtract from weights to minimize cost
         self.__w -= avg_gradient
 
     def fit(self, X_train, y_train, eps=1e-6):
@@ -90,14 +83,15 @@ class LogisticRegression:
         cost = np.inf
 
         for i in range(self.iter_num):
-            self.update_weights(X_train, y_train)
+            self._update_weights(X_train, y_train)
             # Calculate error for auditing purposes
             tmp = self.loss(X_train, y_train)
             if np.abs(tmp - cost) < eps:
                 cost = tmp
                 break
             cost = tmp
-
+        self.intercept_ = self.__w[0]
+        self.coef_ = self.__w[1:]
         return self
 
     def predict(self, X_test):
@@ -106,6 +100,7 @@ class LogisticRegression:
         :param X_test: test data for predict in
         :return: y_test: predicted values
         """
+        assert self.__fitted, 'Model is not fitted'
         if not all(X_test[:, 0] == 1):
             ones = np.ones((X_test.shape[0], 1))
             X_test = np.hstack([ones, X_test])
@@ -118,20 +113,24 @@ class LogisticRegression:
         :param X_test: test data for predict in
         :return: y_test: predicted probabilities
         """
+        assert self.__fitted, 'Model is not fitted'
         if not all(X_test[:, 0] == 1):
             ones = np.ones((X_test.shape[0], 1))
             X_test = np.hstack([ones, X_test])
         z = np.dot(X_test, self.__w)
-        return self._sigmoid(z)
+        res = self._sigmoid(z)
+        return np.column_stack([1 - res, res])
 
     def get_weights(self):
         """
         Get weights from fitted linear model
         :return: weights array
         """
+        assert self.__fitted, 'Model is not fitted'
         return self.__w
 
     def __repr__(self):
         name = self.__class__.__name__
         return f'{name}(learning_rate={self.learning_rate}, ' +\
-               f'regularization={self.regularizarion}, alpha={self.alpha})'
+               f'regularization={self.regularizarion}, alpha={self.alpha}, ' +\
+               f'n_iterations={self.iter_num})'
