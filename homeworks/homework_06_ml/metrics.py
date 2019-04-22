@@ -33,6 +33,6 @@ def r2_score(y_true, y_hat):
     :return: loss
     """
     mean_y = y_true.mean()
-    Qfact = (y_hat - mean_y).dot((y_hat - mean_y))
-    Qall = (y_true - mean_y).dot((y_true - mean_y))
-    return Qfact / Qall
+    qfact = (y_hat - mean_y).dot((y_hat - mean_y))
+    qall = (y_true - mean_y).dot((y_true - mean_y))
+    return 1 - (qfact / qall)

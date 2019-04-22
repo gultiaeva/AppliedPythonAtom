@@ -32,7 +32,8 @@ class LinearRegression:
         ones = np.ones((X_train.shape[0], 1))
         X_train = np.hstack([ones, X_train])
         n, m = X_train.shape
-        cost_history = np.zeros(iterations)
+        # cost_history = np.zeros(iterations)
+        tmp = np.inf
         self.__w = np.random.randn(m) / np.sqrt(m)
         for it in range(iterations):
             if self.regularizarion == 'L1':
@@ -46,9 +47,10 @@ class LinearRegression:
             prediction = self.predict(X_train)
             self.__w -= (2/n) * self.learning_rate*(X_train.T.dot(
                 (prediction - y_train)) + add)
-            cost_history[it] = mse(y_train, prediction)
-            if it and abs(cost_history[it] - cost_history[it-1]) < eps:
+            cost = mse(y_train, prediction)
+            if np.abs(tmp - cost) < eps:
                 break
+            tmp = cost
         self.coef_ = self.__w[1:]
         self.intercept_ = self.__w[0]
         return self
@@ -72,10 +74,12 @@ class LinearRegression:
         Get weights from fitted linear model
         :return: weights array
         """
-        assert getattr(self, '__w', 0) != 0, 'Model is not fitted'
+        assert self.__fitted, 'Model is not fitted'
         return self.__w
 
     def __repr__(self):
         name = self.__class__.__name__
-        return f'{name}(learning_rate={self.learning_rate}, '\
-               f'regularization={self.regularizarion}, alpha={self.alpha})'
+        return f'{name}(learning_rate={self.learning_rate}, ' +\
+               f'regularization={self.regularizarion}, ' +\
+               f'alpha={self.alpha})\n' +\
+               f'weights = {self.get_weights()}'
