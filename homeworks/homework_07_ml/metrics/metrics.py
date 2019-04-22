@@ -26,7 +26,7 @@ def accuracy(y_true, y_pred):
     :param y_hat: vector of estimated class values
     :return: loss
     """
-    return (y_true == y_pred) / len(y_pred)
+    return (y_true == y_pred).sum() / len(y_pred)
 
 
 def presicion(y_true, y_pred):
@@ -36,7 +36,7 @@ def presicion(y_true, y_pred):
     :param y_hat: vector of estimated class values
     :return: loss
     """
-    y_pred[y_true == y_pred].sum() / (y_pred == 1).sum()
+    return (y_pred[y_true == y_pred] == 1).sum() / (y_pred == 1).sum()
 
 
 def recall(y_true, y_pred):
@@ -46,7 +46,17 @@ def recall(y_true, y_pred):
     :param y_hat: vector of estimated class values
     :return: loss
     """
-    y_pred[y_true == y_pred].sum() / (y_true == 1).sum()
+    return y_pred[y_true == y_pred].sum() / (y_true == 1).sum()
+
+
+def fpr(y_true, y_pred):
+    """
+    false positive rate
+    :param y_true: vector of truth (correct) class values
+    :param y_hat: vector of estimated class values
+    :return: loss
+    """
+    return (y_pred[y_true == 0] == 1).sum() / (y_true == 0).sum()
 
 
 def roc_auc(y_true, y_pred):
@@ -56,4 +66,12 @@ def roc_auc(y_true, y_pred):
     :param y_hat: vector of estimated probabilities
     :return: loss
     """
-    pass
+    tpr_list = []
+    fpr_list = []
+    treshold = 0
+    for treshold in np.linspace(0, 1, 101):
+        tmp = (y_pred >= treshold).astype('int64')
+        tpr_list.append(recall(y_true, tmp))
+        fpr_list.append(fpr(y_true, tmp))
+    roc_auc = np.abs(np.trapz(tpr_list, fpr_list))
+    return roc_auc
