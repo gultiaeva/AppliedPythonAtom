@@ -48,4 +48,5 @@ class DecisionStumpRegressor:
         :param X: массив размера (1, num_objects)
         :return: массив, размера (1, num_objects)
         '''
-        return np.array([self.left, self.right])[(X >= self.th).astype('int64')]
+        return np.array([self.left,
+                         self.right])[(X >= self.th).astype('int64')]
